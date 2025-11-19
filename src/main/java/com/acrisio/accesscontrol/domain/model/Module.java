@@ -21,7 +21,7 @@ public class Module implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tb_module")
-    private  Long Id;
+    private  Long id;
 
     @Column(name = "tb_module_name", nullable = false)
     private  String name;
