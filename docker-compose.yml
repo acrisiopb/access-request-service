@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: access_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: access_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - access_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app1:
+    build: .
+    container_name: access_app_1
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/access_db
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - access_net
+
+  app2:
+    build: .
+    container_name: access_app_2
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/access_db
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - access_net
+
+  app3:
+    build: .
+    container_name: access_app_3
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/access_db
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - access_net
+
+  nginx:
+    image: nginx:latest
+    container_name: access_lb
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+    networks:
+      - access_net
+
+volumes:
+  pgdata:
+
+networks:
+  access_net:
