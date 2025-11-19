@@ -13,4 +13,5 @@ public record AccessRequestListDTO (
         String deniedReason,
         String modules
 ){
+
 }

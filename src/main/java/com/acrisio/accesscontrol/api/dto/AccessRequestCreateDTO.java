@@ -8,6 +8,9 @@ import java.util.List;
 
 public record AccessRequestCreateDTO(
 
+        @NotNull(message = "User ID is required")
+        Long userId,
+        
         @NotNull(message = "Module IDs are required")
         @Size(min = 1, max = 3, message = "You must select between 1 and 3 modules")
         List<Long> moduleIds,
