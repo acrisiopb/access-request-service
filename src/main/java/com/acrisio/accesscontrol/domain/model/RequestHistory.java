@@ -1,5 +1,6 @@
 package com.acrisio.accesscontrol.domain.model;
 
+import com.acrisio.accesscontrol.domain.enums.HistoryAction;
 import jakarta.persistence.*;
 import lombok.*;
 

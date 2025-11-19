@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_user")
@@ -34,7 +36,10 @@ public class User implements Serializable {
     private Department department;
 
     // Relacionamentos
-    // private List<Access> accesses = new ArrayList<>();
-    // private List<AccessRequest> requests = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Access> accesses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<AccessRequest> requests = new ArrayList<>();
 
 }
