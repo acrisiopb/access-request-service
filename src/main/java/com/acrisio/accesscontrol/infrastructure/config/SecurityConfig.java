@@ -1,4 +1,4 @@
-package com.acrisio.accesscontrol.config;
+package com.acrisio.accesscontrol.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

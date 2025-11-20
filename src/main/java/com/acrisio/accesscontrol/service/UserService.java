@@ -4,6 +4,7 @@ import com.acrisio.accesscontrol.api.dto.UserCreateDTO;
 import com.acrisio.accesscontrol.api.dto.UserDTO;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,28 +18,29 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final InternationalizationUtil message;
 
     @Transactional
     public UserDTO create(UserCreateDTO dto) {
 
         if (dto.name() == null || dto.name().isBlank()) {
-            throw new IllegalArgumentException("Name is required");
+            throw new IllegalArgumentException(message.getMessage("User.name"));
         }
 
         if (dto.email() == null || dto.email().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new IllegalArgumentException(message.getMessage("User.email"));
         }
 
         if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new IllegalArgumentException(message.getMessage("User.emailExists"));
         }
 
         if (dto.password() == null || dto.password().length() < 6) {
-            throw new IllegalArgumentException("Password must have at least 6 characters");
+            throw new IllegalArgumentException(message.getMessage("User.password"));
         }
 
         if (dto.department() == null) {
-            throw new IllegalArgumentException("Department is required");
+            throw new IllegalArgumentException(message.getMessage("Department.User"));
         }
 
         User user = new User();
@@ -56,7 +58,7 @@ public class UserService {
     public UserDTO update(UserDTO dto) {
 
         User user = userRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User.notfound")));
 
         user.setName(dto.name());
         user.setEmail(dto.email());
@@ -69,7 +71,7 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("User not found");
+            throw new IllegalArgumentException(message.getMessage("User.notfound"));
         }
         userRepository.deleteById(id);
     }
@@ -84,7 +86,7 @@ public class UserService {
 
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User.notfound")));
 
         return toDTO(user);
     }

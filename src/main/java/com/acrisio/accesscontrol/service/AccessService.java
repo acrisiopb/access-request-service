@@ -5,6 +5,8 @@ import com.acrisio.accesscontrol.domain.model.Access;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.AccessRepositoy;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
+import com.acrisio.accesscontrol.exception.EntityNotFoundException;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,13 +20,13 @@ public class AccessService {
 
     private final AccessRepositoy accessRepository;
     private final UserRepository userRepository;
-
+    private final InternationalizationUtil message;
 
     @Transactional
     public AccessResponseDTO revoke(Long id) {
 
         Access access = accessRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Access not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Access.notfound")));
 
         accessRepository.delete(access);
         return toDTO(access);
@@ -34,7 +36,7 @@ public class AccessService {
     public AccessResponseDTO renew(Long id) {
 
         Access access = accessRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Access not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Access.notfound")));
 
         access.setExpiresAt(access.getExpiresAt().plusDays(180));
         accessRepository.save(access);
@@ -44,7 +46,7 @@ public class AccessService {
 
     public AccessResponseDTO findById(Long id) {
         Access access = accessRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Access not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Access.notfound")));
 
         return toDTO(access);
     }
@@ -52,7 +54,7 @@ public class AccessService {
     public List<AccessResponseDTO> findByUser(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Access.notfound")));
 
         return accessRepository.findByUser(user)
                 .stream()

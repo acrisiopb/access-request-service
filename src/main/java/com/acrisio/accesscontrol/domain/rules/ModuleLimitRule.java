@@ -14,11 +14,17 @@ public class ModuleLimitRule implements AccessRequestRule {
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
-        int activeCount = user.getActiveAccesses().size();
-        int limit = user.getDepartment() == Department.TI ? 10 : 5;
+        int activeCount = user.getActiveAccesses() != null
+                ? user.getActiveAccesses().size()
+                : 0;
+
+        int limit = (user.getDepartment() == Department.TI) ? 10 : 3;
 
         if (activeCount + requestedModules.size() > limit) {
-            throw new IllegalArgumentException("You exceeded the module access limit");
+            throw new IllegalArgumentException(
+                    "Access limit exceeded. Department " + user.getDepartment()
+                            + " allows maximum of " + limit + " modules."
+            );
         }
     }
 }

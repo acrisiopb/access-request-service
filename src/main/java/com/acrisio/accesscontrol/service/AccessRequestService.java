@@ -13,6 +13,7 @@ import com.acrisio.accesscontrol.domain.repository.AccessRequestRepository;
 import com.acrisio.accesscontrol.domain.repository.ModuleRepository;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
 import com.acrisio.accesscontrol.domain.rules.AccessRequestRule;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,14 +34,14 @@ public class AccessRequestService {
     private final ModuleRepository moduleRepository;
     private final AccessRepositoy accessRepository;
     private final AccessRequestRepository accessRequestRepository;
-
     private final List<AccessRequestRule> rules;
+    private final InternationalizationUtil message;
 
     @Transactional
     public AccessRequestResponseDTO createRequest(AccessRequestCreateDTO dto) {
 
         User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User not found")));
 
         Set<Module> modules = loadModules(new HashSet<>(dto.moduleIds()));
 
@@ -64,7 +65,7 @@ public class AccessRequestService {
             createAccesses(user, modules);
         } else {
             request.setStatus(RequestStatus.DENIED);
-            request.setDeniedReason("Rule violation");
+            request.setDeniedReason(message.getMessage("AccessRequest.Rule"));
         }
 
         accessRequestRepository.save(request);
@@ -82,7 +83,7 @@ public class AccessRequestService {
 
     public AccessRequestResponseDTO findById(Long id) {
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
 
         return toResponseDTO(req);
     }
@@ -90,7 +91,7 @@ public class AccessRequestService {
     public List<AccessRequestResponseDTO> listByUser(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User.notfound")));
 
         return accessRequestRepository.findByUser(user)
                 .stream()
@@ -102,14 +103,14 @@ public class AccessRequestService {
     public AccessRequestResponseDTO cancel(Long requestId) {
 
         AccessRequest req = accessRequestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
 
         if (req.getStatus() == RequestStatus.DENIED) {
-            throw new IllegalArgumentException("Denied requests cannot be canceled");
+            throw new IllegalArgumentException(message.getMessage("AccessRequest.denied"));
         }
 
         req.setStatus(RequestStatus.CANCELED);
-        req.setDeniedReason("Request canceled by user");
+        req.setDeniedReason(message.getMessage("User.cancel"));
         req.setExpiresAt(null);
 
         accessRequestRepository.save(req);
@@ -121,7 +122,7 @@ public class AccessRequestService {
     @Transactional
     public void delete(Long id) {
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
 
         accessRequestRepository.delete(req);
     }
@@ -189,15 +190,15 @@ public class AccessRequestService {
     public AccessRequestResponseDTO renew(Long id) {
 
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
 
         // Regras básicas
         if (req.getStatus() == RequestStatus.CANCELED) {
-            throw new IllegalArgumentException("Canceled requests cannot be renewed");
+            throw new IllegalArgumentException("AccessRequest.denied.renewd");
         }
 
         if (req.getStatus() == RequestStatus.DENIED) {
-            throw new IllegalArgumentException("Denied requests cannot be renewed");
+            throw new IllegalArgumentException(message.getMessage("AccessRequest.cancelled"));
         }
 
         // Renovação
