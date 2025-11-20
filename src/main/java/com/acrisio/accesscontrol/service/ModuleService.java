@@ -38,7 +38,7 @@ public class ModuleService {
         return toDTO(module);
     }
 
-    public List<ModuleDTO> listAll() {
+    public List<ModuleDTO> findAll() {
         return moduleRepository.findAll().stream()
                 .map(this::toDTO)
                 .toList();
