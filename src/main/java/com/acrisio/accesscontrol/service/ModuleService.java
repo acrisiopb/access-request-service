@@ -4,6 +4,9 @@ import com.acrisio.accesscontrol.api.dto.ModuleDTO;
 import com.acrisio.accesscontrol.domain.enums.Department;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.repository.ModuleRepository;
+import com.acrisio.accesscontrol.exception.EntityNotFoundException;
+import com.acrisio.accesscontrol.exception.UnprocessableEntityException;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +20,23 @@ import java.util.stream.Collectors;
 public class ModuleService {
 
     private final ModuleRepository moduleRepository;
+    private final InternationalizationUtil message;
 
     public ModuleDTO create(ModuleDTO dto) {
+
+        if (dto.name().isBlank()) {
+            throw new UnprocessableEntityException(message.getMessage("Module.name"));
+        }
+        if (dto.description().isBlank()) {
+            throw new UnprocessableEntityException(message.getMessage("Module.description"));
+        }
+        if (dto.active() == null) {
+            throw new UnprocessableEntityException(message.getMessage("Module.active"));
+        }
+        if (dto.permittedDepartments().isEmpty()) {
+            throw new UnprocessableEntityException(message.getMessage("Department.User"));
+        }
+
         Module module = new Module();
         module.setName(dto.name());
         module.setDescription(dto.description());
@@ -46,13 +64,25 @@ public class ModuleService {
 
     public ModuleDTO findById(Long id) {
         Module module = moduleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Module not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Module.notfound")));
         return toDTO(module);
     }
 
     public ModuleDTO update(ModuleDTO dto) {
         Module module = moduleRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException("Module not found"));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("Module.notfound")));
+        if (dto.name().isBlank()) {
+            throw new UnprocessableEntityException(message.getMessage("Module.name"));
+        }
+        if (dto.description().isBlank()) {
+            throw new UnprocessableEntityException(message.getMessage("Module.description"));
+        }
+        if (dto.active() == null) {
+            throw new UnprocessableEntityException(message.getMessage("Module.active"));
+        }
+        if (dto.permittedDepartments().isEmpty()) {
+            throw new UnprocessableEntityException(message.getMessage("Department.User"));
+        }
 
         module.setName(dto.name());
         module.setDescription(dto.description());
@@ -71,7 +101,7 @@ public class ModuleService {
 
     public void delete(Long id) {
         if (!moduleRepository.existsById(id)) {
-            throw new IllegalArgumentException("Module not found");
+            throw new EntityNotFoundException(message.getMessage("Module.notfound"));
         }
         moduleRepository.deleteById(id);
     }

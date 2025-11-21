@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.ErrorMessage;
+import com.acrisio.accesscontrol.exception.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Módulos", description = "Contém todas as operações relativas aos recursos para o gerenciamento dos módulos.")
 @ApiResponses(value = {
+        // CORREÇÃO AQUI: Use ModuleDTO.class
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) }),
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ModuleDTO.class)) }),
+
         @ApiResponse(responseCode = "404", description = "modules not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) })
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)) })
 })
 public class ModuleController {
 

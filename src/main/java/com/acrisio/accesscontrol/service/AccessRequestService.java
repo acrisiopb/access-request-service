@@ -13,8 +13,9 @@ import com.acrisio.accesscontrol.domain.repository.AccessRequestRepository;
 import com.acrisio.accesscontrol.domain.repository.ModuleRepository;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
 import com.acrisio.accesscontrol.domain.rules.AccessRequestRule;
+import com.acrisio.accesscontrol.exception.EntityNotFoundException;
+import com.acrisio.accesscontrol.exception.UnprocessableEntityException;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +42,21 @@ public class AccessRequestService {
     public AccessRequestResponseDTO createRequest(AccessRequestCreateDTO dto) {
 
         User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User not found")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("User.notfound")));
 
         Set<Module> modules = loadModules(new HashSet<>(dto.moduleIds()));
 
         for (AccessRequestRule rule : rules) {
             rule.validate(user, modules, dto);
+        }
+        if (dto.moduleIds().isEmpty() || dto.moduleIds() == null) {
+            throw new UnprocessableEntityException(message.getMessage("Module.null"));
+        }
+        if(dto.justification().isBlank()){
+            throw new UnprocessableEntityException(message.getMessage("Module.justification"));
+        }
+        if (dto.urgent() == null){
+            throw new UnprocessableEntityException(message.getMessage("Module.urgent"));
         }
 
         AccessRequest request = new AccessRequest();
@@ -67,11 +77,9 @@ public class AccessRequestService {
             request.setStatus(RequestStatus.DENIED);
             request.setDeniedReason(message.getMessage("AccessRequest.Rule"));
         }
-
         accessRequestRepository.save(request);
         return toResponseDTO(request);
     }
-
 
 
     public List<AccessRequestResponseDTO> findAll() {
@@ -83,7 +91,7 @@ public class AccessRequestService {
 
     public AccessRequestResponseDTO findById(Long id) {
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
         return toResponseDTO(req);
     }
@@ -103,7 +111,7 @@ public class AccessRequestService {
     public AccessRequestResponseDTO cancel(Long requestId) {
 
         AccessRequest req = accessRequestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
         if (req.getStatus() == RequestStatus.DENIED) {
             throw new IllegalArgumentException(message.getMessage("AccessRequest.denied"));
@@ -122,7 +130,7 @@ public class AccessRequestService {
     @Transactional
     public void delete(Long id) {
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
         accessRequestRepository.delete(req);
     }
@@ -131,7 +139,7 @@ public class AccessRequestService {
     private Set<Module> loadModules(Set<Long> moduleIds) {
         return moduleIds.stream()
                 .map(id -> moduleRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Module not found: " + id)))
+                        .orElseThrow(() -> new EntityNotFoundException( message.getMessage("Module.notfound") + " ID = " + id)))
                 .collect(Collectors.toSet());
     }
 
@@ -190,7 +198,7 @@ public class AccessRequestService {
     public AccessRequestResponseDTO renew(Long id) {
 
         AccessRequest req = accessRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("AccessRequest.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
         // Regras básicas
         if (req.getStatus() == RequestStatus.CANCELED) {

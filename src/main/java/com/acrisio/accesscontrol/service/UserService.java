@@ -4,6 +4,9 @@ import com.acrisio.accesscontrol.api.dto.UserCreateDTO;
 import com.acrisio.accesscontrol.api.dto.UserDTO;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
+import com.acrisio.accesscontrol.exception.EntityNotFoundException;
+import com.acrisio.accesscontrol.exception.NameUniqueViolationException;
+import com.acrisio.accesscontrol.exception.UnprocessableEntityException;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,23 +27,23 @@ public class UserService {
     public UserDTO create(UserCreateDTO dto) {
 
         if (dto.name() == null || dto.name().isBlank()) {
-            throw new IllegalArgumentException(message.getMessage("User.name"));
+            throw new NameUniqueViolationException(message.getMessage("User.name"));
         }
 
         if (dto.email() == null || dto.email().isBlank()) {
-            throw new IllegalArgumentException(message.getMessage("User.email"));
+            throw new NameUniqueViolationException(message.getMessage("User.email"));
         }
 
         if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException(message.getMessage("User.emailExists"));
+            throw new NameUniqueViolationException(message.getMessage("User.emailExists"));
         }
 
         if (dto.password() == null || dto.password().length() < 6) {
-            throw new IllegalArgumentException(message.getMessage("User.password"));
+            throw new UnprocessableEntityException(message.getMessage("User.password"));
         }
 
         if (dto.department() == null) {
-            throw new IllegalArgumentException(message.getMessage("Department.User"));
+            throw new UnprocessableEntityException(message.getMessage("Department.User"));
         }
 
         User user = new User();
@@ -58,8 +61,24 @@ public class UserService {
     public UserDTO update(UserDTO dto) {
 
         User user = userRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("User.notfound")));
 
+        if (dto.name() == null || dto.name().isBlank()) {
+            throw new NameUniqueViolationException(message.getMessage("User.name"));
+        }
+
+        if (dto.email() == null || dto.email().isBlank()) {
+            throw new NameUniqueViolationException(message.getMessage("User.email"));
+        }
+
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new NameUniqueViolationException(message.getMessage("User.emailExists"));
+        }
+
+
+        if (dto.department() == null) {
+            throw new UnprocessableEntityException(message.getMessage("Department.User"));
+        }
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setDepartment(dto.department());
@@ -71,7 +90,7 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException(message.getMessage("User.notfound"));
+            throw new EntityNotFoundException(message.getMessage("User.notfound"));
         }
         userRepository.deleteById(id);
     }
@@ -86,7 +105,7 @@ public class UserService {
 
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(message.getMessage("User.notfound")));
+                .orElseThrow(() -> new EntityNotFoundException(message.getMessage("User.notfound")));
 
         return toDTO(user);
     }

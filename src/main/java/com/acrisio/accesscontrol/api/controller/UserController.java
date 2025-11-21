@@ -1,5 +1,6 @@
 package com.acrisio.accesscontrol.api.controller;
 
+import com.acrisio.accesscontrol.api.dto.AccessRequestResponseDTO;
 import com.acrisio.accesscontrol.api.dto.UserCreateDTO;
 import com.acrisio.accesscontrol.api.dto.UserDTO;
 import com.acrisio.accesscontrol.service.UserService;
@@ -10,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.ErrorMessage;
+import com.acrisio.accesscontrol.exception.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +21,15 @@ import java.util.List;
 @RestController
 @Tag(name = "Usuário", description = "Contém todas as operações relativas aos recursos para o gerenciamento de usuário.")
 @ApiResponses(value = {
+        // CORREÇÃO AQUI: Sucesso retorna UserDTO, não ErrorMessage
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) }),
+                @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class)) }),
+
         @ApiResponse(responseCode = "404", description = "user not found"),
+
+        // Erro 500 continua retornando ErrorMessage (agora com o import correto)
         @ApiResponse(responseCode = "500", description = "Internal server error", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) })
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)) })
 })
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -33,7 +38,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Criar um novo usuário.", description = "Adicionar um novo usuário. Usuário com Departamentos [TI], podem ser adicionado até 10 Módulos" +
-           "Caso não seja, apenas 1 a 3 módulos é aceito. ")
+            "Caso não seja, apenas 1 a 3 módulos é aceito. ")
     @PostMapping
     public ResponseEntity<UserDTO> create(@Valid @RequestBody UserCreateDTO dto) {
         return ResponseEntity.ok(userService.create(dto));

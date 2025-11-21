@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.ErrorMessage;
+import com.acrisio.accesscontrol.exception.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Solicitação de Acesso", description = "Contém todas as operações relativas aos recursos para as solicitações de acesso.")
 @ApiResponses(value = {
+        // CORREÇÃO AQUI: Use AccessRequestResponseDTO.class
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) }),
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AccessRequestResponseDTO.class)) }),
+
         @ApiResponse(responseCode = "404", description = "user not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) })
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)) })
 })
 public class AccessRequestController {
 

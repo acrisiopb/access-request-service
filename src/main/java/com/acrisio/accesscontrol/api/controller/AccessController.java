@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.ErrorMessage;
+import com.acrisio.accesscontrol.exception.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Acesso", description = "Contém todas as operações relativas aos recursos para o gerenciamento de acessos dos usuarios.")
 @ApiResponses(value = {
+        // CORREÇÃO AQUI: Use AccessResponseDTO.class
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) }),
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AccessResponseDTO.class)) }),
+
         @ApiResponse(responseCode = "404", description = "access not found"),
+        // Lembre-se de corrigir o import do ErrorMessage aqui também para a sua classe personalizada
         @ApiResponse(responseCode = "500", description = "Internal server error", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation =  ErrorMessage.class)) })
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)) })
 })
 public class AccessController {
 
