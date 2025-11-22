@@ -18,12 +18,12 @@ public class ModuleLimitRule implements AccessRequestRule {
                 ? user.getActiveAccesses().size()
                 : 0;
 
-        int limit = (user.getDepartment() == Department.TI) ? 10 : 3;
+        int limit = (user.getDepartment() == Department.TI) ? 10 : 5;
 
         if (activeCount + requestedModules.size() > limit) {
             throw new IllegalArgumentException(
-                    "Access limit exceeded. Department " + user.getDepartment()
-                            + " allows maximum of " + limit + " modules."
+                    "Limite de módulos ativos excedido. Departamento " + user.getDepartment()
+                            + " permite no máximo " + limit + " módulos."
             );
         }
     }

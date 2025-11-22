@@ -1,10 +1,12 @@
 package com.acrisio.accesscontrol.domain.rules;
 
 import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
+import com.acrisio.accesscontrol.domain.model.Access;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 @Component
@@ -13,13 +15,26 @@ public class DuplicateActiveAccessRule implements AccessRequestRule {
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
-        Set<Module> active = user.getActiveModules();
+        if (user.getActiveAccesses() == null) {
+            return;
+        }
 
-        for (Module m : requestedModules) {
-            if (active.contains(m)) {
-                throw new IllegalArgumentException(
-                        "You already have access to module: " + m.getName()
-                );
+        OffsetDateTime now = OffsetDateTime.now();
+
+        for (Module requested : requestedModules) {
+            for (Access access : user.getActiveAccesses()) {
+
+                boolean sameModule =
+                        access.getModule().getId().equals(requested.getId());
+
+                boolean notExpired =
+                        access.getExpiresAt() != null && access.getExpiresAt().isAfter(now);
+
+                if (sameModule && notExpired) {
+                    throw new IllegalArgumentException(
+                            "Usuário já possui acesso ativo ao módulo: " + requested.getName()
+                    );
+                }
             }
         }
     }

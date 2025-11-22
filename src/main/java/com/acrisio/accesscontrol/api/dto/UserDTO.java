@@ -7,5 +7,6 @@ public record UserDTO(
         String name,
         String email,
         Department department
+
 ) {
 }

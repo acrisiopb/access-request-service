@@ -17,10 +17,13 @@ public class ModuleCompatibilityRule implements AccessRequestRule {
 
         for (Module requested : requestedModules) {
             for (Module activeModule : active) {
-                if (requested.getIncompatibleModules().contains(activeModule)) {
+                boolean incompatible = requested.getIncompatibleModules()
+                        .stream()
+                        .anyMatch(m -> m.getId().equals(activeModule.getId()));
+                if (incompatible) {
                     throw new IllegalArgumentException(
-                            "Module " + requested.getName() +
-                                    " is incompatible with active module " + activeModule.getName()
+                            "Módulo " + requested.getName() +
+                                    " é incompatível com o módulo ativo " + activeModule.getName()
                     );
                 }
             }

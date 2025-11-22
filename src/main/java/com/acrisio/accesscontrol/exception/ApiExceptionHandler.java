@@ -68,4 +68,19 @@ public class ApiExceptionHandler {
                         ex.getMessage()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> illegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        log.error("Api Error - ", ex);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(
+                        request,
+                        HttpStatus.UNAUTHORIZED,
+                        ex.getMessage()));
+    }
+
 }

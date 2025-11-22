@@ -3,6 +3,8 @@ package com.acrisio.accesscontrol.infrastructure.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,10 +18,22 @@ public class OpenAPIConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Access Control API")
-                        .description("API para gerenciamento de usuários, módulos, acessos e solicitações de acesso.")
+                        .description(
+                                "API para gerenciamento de usuários, módulos, acessos e solicitações de acesso.\n\n" +
+                                        "Login: test@admin.com\n\n" +
+                                        "Senha: test123"
+                        )
                         .version("1.0.0"))
                 .servers(List.of(
                         new Server().url("/").description("Default Server URL")
-                ));
+                ))
+                .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+                .components(new io.swagger.v3.oas.models.Components()
+                        .addSecuritySchemes("BearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        ));
     }
 }

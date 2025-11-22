@@ -14,6 +14,7 @@ public record AccessRequestResponseDTO(
         OffsetDateTime createdAt,
         OffsetDateTime expiresAt,
         String deniedReason,
-        List<ModuleDTO> modules
+        List<ModuleDTO> modules,
+        List<RequestHistoryDTO> history
 ) {
 }

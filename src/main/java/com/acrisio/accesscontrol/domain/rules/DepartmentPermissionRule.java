@@ -1,6 +1,7 @@
 package com.acrisio.accesscontrol.domain.rules;
 
 import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
+import com.acrisio.accesscontrol.domain.enums.Department;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import org.springframework.stereotype.Component;
@@ -12,12 +13,56 @@ public class DepartmentPermissionRule implements AccessRequestRule {
 
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
-        for (Module m : requestedModules) {
-            if (!m.getPermittedDepartments().contains(user.getDepartment())) {
-                throw new IllegalArgumentException(
-                        "Your department is not allowed to access module: " + m.getName()
-                );
+
+        Department dept = user.getDepartment();
+
+        for (Module module : requestedModules) {
+
+            String code = module.getName().toUpperCase();
+
+            // TI → todos os módulos
+            if (dept == Department.TI) continue;
+
+            // Financeiro
+            if (dept == Department.FINANCE) {
+                if (code.equals("GESTAO_FINANCEIRA") ||
+                        code.equals("APROVADOR_FINANCEIRO") ||
+                        code.equals("SOLICITANTE_FINANCEIRO") ||
+                        code.equals("RELATORIOS") ||
+                        code.equals("PORTAL")) {
+                    continue;
+                }
+                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
             }
+
+            // RH
+            if (dept == Department.RH) {
+                if (code.equals("ADMINISTRADOR_RH") ||
+                        code.equals("COLABORADOR_RH") ||
+                        code.equals("RELATORIOS") ||
+                        code.equals("PORTAL")) {
+                    continue;
+                }
+                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+            }
+
+            // Operações
+            if (dept == Department.OPERATIONS) {
+                if (code.equals("ESTOQUE") ||
+                        code.equals("COMPRAS") ||
+                        code.equals("RELATORIOS") ||
+                        code.equals("PORTAL")) {
+                    continue;
+                }
+                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+            }
+
+            // Outros departamentos
+            if (code.equals("PORTAL") || code.equals("RELATORIOS")) {
+                continue;
+            }
+
+            throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
         }
     }
 }

@@ -61,8 +61,14 @@ public class AccessRequest implements Serializable {
     @Column(name = "tb_access_request_expires_at")
     private OffsetDateTime expiresAt;
 
+    // Solicitação original (para renovações)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_origin_request")
+    private AccessRequest originRequest;
+
     // Histórico de alterações
     @OneToMany(mappedBy = "accessRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestHistory> history;
+
 
 }

@@ -1,24 +1,34 @@
 package com.acrisio.accesscontrol.domain.rules;
 
 import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
+import com.acrisio.accesscontrol.domain.enums.RequestStatus;
+import com.acrisio.accesscontrol.domain.model.AccessRequest;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
+import com.acrisio.accesscontrol.domain.enums.RequestStatus;
+import com.acrisio.accesscontrol.domain.repository.AccessRequestRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class DuplicateActiveRequestRule implements AccessRequestRule {
+
+    private final AccessRequestRepository accessRequestRepository;
 
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
-        Set<Module> requestedBefore = user.getRequestedModules();
-
-        for (Module m : requestedModules) {
-            if (requestedBefore.contains(m)) {
+        var existing = accessRequestRepository.findByUser(user);
+        for (Module requested : requestedModules) {
+            boolean conflict = existing.stream()
+                    .anyMatch(req -> req.getStatus() == RequestStatus.ACTIVE &&
+                            req.getModules().stream().anyMatch(m -> m.getId().equals(requested.getId())));
+            if (conflict) {
                 throw new IllegalArgumentException(
-                        "You already have an active request for: " + m.getName()
+                        "Usuário já possui uma solicitação ativa para o módulo: " + requested.getName()
                 );
             }
         }
