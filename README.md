@@ -1,7 +1,7 @@
 # Serviço de solicitação de acesso <h5>`Access Request Service`</h5>
 
 <div align="center"> 
-  <img src="Img\Access.gif" alt="">
+  <img src="https://github.com/acrisiopb/access-request-service/blob/main/Img/Access.gif" alt="Apresentação">
 </div> 
 
 Serviço de controle de acessos corporativos com autenticação JWT, solicitações de acesso, renovação e histórico, pronto para execução local com Docker e com suíte de testes e cobertura configuradas.
