@@ -7,7 +7,6 @@ import com.acrisio.accesscontrol.domain.repository.ModuleRepository;
 import com.acrisio.accesscontrol.exception.EntityNotFoundException;
 import com.acrisio.accesscontrol.exception.UnprocessableEntityException;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

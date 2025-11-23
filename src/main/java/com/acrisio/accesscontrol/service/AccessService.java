@@ -118,14 +118,17 @@ public class AccessService {
         accessRequestRepository.save(newReq);
 
         //Registrar histórico
-        RequestHistory history = RequestHistory.builder()
-                .accessRequest(newReq)
-                .action(HistoryAction.RENEWED)
-                .description("Renovação do acesso")
-                .date(now)
-                .build();
+        if (approved) {
+            //Registrar histórico
+            RequestHistory history = RequestHistory.builder()
+                    .accessRequest(newReq)
+                    .action(HistoryAction.RENEWED)
+                    .description("Renovação do acesso")
+                    .date(now)
+                    .build();
 
-        requestHistoryRepository.save(history);
+            requestHistoryRepository.save(history);
+        }
 
         return toDTO(access);
     }

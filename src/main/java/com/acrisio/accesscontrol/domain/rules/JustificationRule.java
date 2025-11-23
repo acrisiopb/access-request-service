@@ -5,14 +5,15 @@ import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
-
+import lombok.RequiredArgsConstructor;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Component
 public class JustificationRule implements AccessRequestRule {
-    private InternationalizationUtil message;
+    private final InternationalizationUtil message;
 
     private static final List<String> GENERIC_WORDS = List.of(
             "teste", "testando", "aaa", "aaaa", "aaaaa", "preciso", "favor liberar",

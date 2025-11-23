@@ -1,21 +1,23 @@
-INSERT INTO tb_user (id_tb_user, tb_user_name, tb_user_email, tb_user_password_hash, tb_user_department) VALUES
-  (1, 'Alice Dev', 'alice@corp.com', 'x', 'TI'),
-  (2, 'Bruno Finance', 'bruno@corp.com', 'x', 'FINANCE'),
-  (3, 'Carla RH', 'carla@corp.com', 'x', 'RH'),
-  (4, 'Diego Ops', 'diego@corp.com', 'x', 'OPERATIONS'),
-  (5, 'Eva Other', 'eva@corp.com', 'x', 'OTHER');
+INSERT INTO tb_user (tb_user_name, tb_user_email, tb_user_password_hash, tb_user_department) VALUES
+  ('Alice Dev', 'alice@corp.com', '$2a$10$7U/UG5V5XQoBU.DQk.UkGePoWKjrCuQwyfjHjG3r9mLThl/PNS68.', 'TI'),
+  ('Bruno Finance', 'bruno@corp.com', 'x', 'FINANCE'),
+  ('Carla RH', 'carla@corp.com', 'x', 'RH'),
+  ('Diego Ops', 'diego@corp.com', 'x', 'OPERATIONS'),
+  ('Eva Other', 'eva@corp.com', 'x', 'OTHER');
 
-INSERT INTO tb_module (id_tb_module, tb_module_name, tb_module_description, tb_module_active) VALUES
-  (1, 'PORTAL', 'Acesso geral ao portal', true),
-  (2, 'RELATORIOS', 'Acesso a relatórios corporativos', true),
-  (3, 'GESTAO_FINANCEIRA', 'Módulo financeiro', true),
-  (4, 'APROVADOR_FINANCEIRO', 'Aprovação de finanças', true),
-  (5, 'SOLICITANTE_FINANCEIRO', 'Solicitação de recursos', true),
-  (6, 'ADMINISTRADOR_RH', 'Administração de recursos humanos', true),
-  (7, 'COLABORADOR_RH', 'Funcionalidades básicas de RH', true),
-  (8, 'ESTOQUE', 'Controle de estoque', true),
-  (9, 'COMPRAS', 'Módulo compras', true),
-  (10, 'AUDITORIA', 'Acesso auditoria', true);
+INSERT INTO tb_module (tb_module_name, tb_module_description, tb_module_active) VALUES
+  ('PORTAL', 'Acesso geral ao portal', true),
+  ('RELATORIOS', 'Acesso a relatórios corporativos', true),
+  ('GESTAO_FINANCEIRA', 'Módulo financeiro', true),
+  ('APROVADOR_FINANCEIRO', 'Aprovação de finanças', true),
+  ('SOLICITANTE_FINANCEIRO', 'Solicitação de recursos', true),
+  ('ADMINISTRADOR_RH', 'Administração de recursos humanos', true),
+  ('COLABORADOR_RH', 'Funcionalidades básicas de RH', true),
+  ('ESTOQUE', 'Controle de estoque', true),
+  ('COMPRAS', 'Módulo compras', true),
+  ('AUDITORIA', 'Acesso auditoria', true);
+
+-- Garantir que os IDs gerados por identidade não colidam com os registros semeados
 
 INSERT INTO tb_module_departments (id_tb_module, department) VALUES
   (1, 'TI'), (1, 'FINANCE'), (1, 'RH'), (1, 'OPERATIONS'), (1, 'OTHER'),
@@ -39,4 +41,5 @@ INSERT INTO tb_access (id_tb_user, id_tb_module, tb_access_granted_at, tb_access
   (4, 8, CURRENT_TIMESTAMP, DATEADD('DAY', 180, CURRENT_TIMESTAMP)),
   (4, 9, CURRENT_TIMESTAMP, DATEADD('DAY', 180, CURRENT_TIMESTAMP)),
   (1, 2, CURRENT_TIMESTAMP, DATEADD('DAY', 180, CURRENT_TIMESTAMP)),
-  (5, 2, CURRENT_TIMESTAMP, DATEADD('DAY', 180, CURRENT_TIMESTAMP));
+  (5, 2, CURRENT_TIMESTAMP, DATEADD('DAY', 180, CURRENT_TIMESTAMP)),
+  (1, 3, CURRENT_TIMESTAMP, DATEADD('DAY', 15, CURRENT_TIMESTAMP));

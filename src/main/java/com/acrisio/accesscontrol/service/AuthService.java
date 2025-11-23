@@ -6,7 +6,6 @@ import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
 import com.acrisio.accesscontrol.infrastructure.security.JwtTokenProvider;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +15,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private  InternationalizationUtil message;
+    private final InternationalizationUtil message;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, InternationalizationUtil message) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.message = message;
     }
 
     public AuthResponseDTO login(AuthLoginRequest req) {

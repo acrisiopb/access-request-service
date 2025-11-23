@@ -6,13 +6,16 @@ import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
-
+import lombok.RequiredArgsConstructor;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Component
 public class DuplicateActiveAccessRule implements AccessRequestRule {
-    private InternationalizationUtil message;
+
+    private final InternationalizationUtil message;
+
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 

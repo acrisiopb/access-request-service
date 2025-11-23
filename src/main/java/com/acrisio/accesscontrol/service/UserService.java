@@ -20,8 +20,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final InternationalizationUtil message;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDTO create(UserCreateDTO dto) {

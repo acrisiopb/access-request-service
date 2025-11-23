@@ -1,7 +1,10 @@
 package com.acrisio.accesscontrol.api.controller;
 
 import com.acrisio.accesscontrol.api.dto.AuthLoginRequest;
-import com.acrisio.accesscontrol.api.dto.ModuleDTO;
+import com.acrisio.accesscontrol.api.dto.UserCreateDTO;
+import com.acrisio.accesscontrol.api.dto.UserDTO;
+import com.acrisio.accesscontrol.domain.enums.Department;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Set;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class ModuleControllerTests {
+class UserControllerTests {
 
     @Autowired
     MockMvc mockMvc;
@@ -30,8 +32,10 @@ class ModuleControllerTests {
 
     String token;
 
-    private static final Long EXISTING_MODULE_ID = 1L;
-    private static final Long NON_EXISTENT_MODULE_ID = 999L;
+    private static final Long EXISTING_USER_ID = 1L;
+    private static final Long NON_EXISTENT_USER_ID = 999L;
+    private static final String EXISTING_EMAIL = "alice@corp.com";
+
 
     @BeforeEach
     void auth() throws Exception {
@@ -46,88 +50,89 @@ class ModuleControllerTests {
         token = node.get("token").asText();
     }
 
-    // TESTES DE SEGURANÇA E LISTAGEM
+    // TESTES DE CRIAÇÃO (POST /user)
 
     @Test
-    void listaModulosSemTokenRetorna401() throws Exception {
-        mockMvc.perform(get("/modules"))
-                .andExpect(status().isUnauthorized());
-    }
+    void createUser_Success() throws Exception {
+        UserCreateDTO createDto = new UserCreateDTO("Novo User", "novo@corp.com", Department.OTHER, "senha123456");
 
-    @Test
-    void listaModulosComTokenRetornaOk() throws Exception {
-        mockMvc.perform(get("/modules").header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value(EXISTING_MODULE_ID));
-    }
-
-    //TESTES DE CRIAÇÃO (POST /modules)
-
-    @Test
-    void createModule_Success() throws Exception {
-        String uniqueName = "NOVO_MODULO_TEST_" + java.util.UUID.randomUUID();
-        ModuleDTO createDto = new ModuleDTO(null, uniqueName, "Descrição do novo módulo", true, Set.of("TI", "RH"), Set.of());
-
-        mockMvc.perform(post("/modules")
+        MvcResult res = mockMvc.perform(post("/user")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(uniqueName));
+                .andExpect(jsonPath("$.email").value("novo@corp.com"))
+                .andReturn();
+
+        // Limpeza (Deletando o usuário criado dinamicamente)
+        JsonNode node = objectMapper.readTree(res.getResponse().getContentAsString());
+        Long newUserId = node.get("id").asLong();
+        UserDTO deleteDto = new UserDTO(newUserId, null, null, null);
+
+        mockMvc.perform(delete("/user")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(deleteDto)));
     }
 
     @Test
-    void createModule_MissingName_Returns422() throws Exception {
-        // Name é obrigatório
-        ModuleDTO createDto = new ModuleDTO(null, " ", "", true, Set.of("ti"), Set.of());
+    void createUser_EmailAlreadyExists_Returns409() throws Exception {
+        UserCreateDTO createDto = new UserCreateDTO("Duplicate User", EXISTING_EMAIL, Department.OTHER, "senha123456");
 
-        mockMvc.perform(post("/modules")
+        mockMvc.perform(post("/user")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
-
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.message").value("Name and required."));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("This email address has already been registered."));
     }
 
-    //  TESTES DE BUSCA
+    // TESTES DE BUSCA
 
     @Test
     void findById_Success() throws Exception {
-        ModuleDTO findDto = new ModuleDTO(EXISTING_MODULE_ID, null, null, null, null, null);
+        UserDTO findDto = new UserDTO(EXISTING_USER_ID, null, null, null);
 
-        mockMvc.perform(post("/modules/find")
+        mockMvc.perform(post("/user/find")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(findDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(EXISTING_MODULE_ID));
+                .andExpect(jsonPath("$.id").value(EXISTING_USER_ID));
     }
 
     @Test
     void findById_NotFound_Returns404() throws Exception {
-        ModuleDTO findDto = new ModuleDTO(NON_EXISTENT_MODULE_ID, null, null, null, null, null);
+        UserDTO findDto = new UserDTO(NON_EXISTENT_USER_ID, null, null, null);
 
-        mockMvc.perform(post("/modules/find")
+        mockMvc.perform(post("/user/find")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(findDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Module not found."));
+                .andExpect(jsonPath("$.message").value("User not found."));
     }
 
-    // TESTES DE DELEÇÃO (DELETE /modules)
+    @Test
+    void findAll_ReturnsAllUsers() throws Exception {
+        mockMvc.perform(get("/user")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(EXISTING_USER_ID));
+    }
+
+    // TESTES DE DELEÇÃO
 
     @Test
-    void deleteModule_NotFound_Returns404() throws Exception {
-        ModuleDTO deleteDto = new ModuleDTO(NON_EXISTENT_MODULE_ID, null, null, null, null, null);
+    void deleteUser_NotFound_Returns404() throws Exception {
+        UserDTO deleteDto = new UserDTO(NON_EXISTENT_USER_ID, null, null, null);
 
-        mockMvc.perform(delete("/modules")
+        mockMvc.perform(delete("/user")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(deleteDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Module not found."));
+                .andExpect(jsonPath("$.message").value("User not found."));
     }
 }

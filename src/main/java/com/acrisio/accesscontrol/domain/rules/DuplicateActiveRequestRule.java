@@ -18,7 +18,8 @@ import java.util.Set;
 public class DuplicateActiveRequestRule implements AccessRequestRule {
 
     private final AccessRequestRepository accessRequestRepository;
-    private InternationalizationUtil message;
+    private final InternationalizationUtil message;
+    
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 

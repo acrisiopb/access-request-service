@@ -21,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Módulos", description = "Contém todas as operações relativas aos recursos para o gerenciamento dos módulos.")
 @ApiResponses(value = {
-        // CORREÇÃO AQUI: Use ModuleDTO.class
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ModuleDTO.class)) }),
 

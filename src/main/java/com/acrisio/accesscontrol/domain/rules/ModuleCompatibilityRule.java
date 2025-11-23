@@ -5,12 +5,15 @@ import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
-
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class ModuleCompatibilityRule implements AccessRequestRule {
-    private InternationalizationUtil message;
+
+    private final InternationalizationUtil message;
+
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 

@@ -3,14 +3,11 @@ package com.acrisio.accesscontrol.domain.model;
 import com.acrisio.accesscontrol.domain.enums.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "tb_access_request")
@@ -29,7 +26,6 @@ public class AccessRequest implements Serializable {
     @JoinColumn(name = "id_tb_user", nullable = false)
     private  User user;
 
-    // Módulos solicitados
     @ManyToMany
     @JoinTable(
             name = "tb_access_request_modules",

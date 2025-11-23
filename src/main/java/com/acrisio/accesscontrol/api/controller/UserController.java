@@ -1,6 +1,5 @@
 package com.acrisio.accesscontrol.api.controller;
 
-import com.acrisio.accesscontrol.api.dto.AccessRequestResponseDTO;
 import com.acrisio.accesscontrol.api.dto.UserCreateDTO;
 import com.acrisio.accesscontrol.api.dto.UserDTO;
 import com.acrisio.accesscontrol.service.UserService;
@@ -21,13 +20,11 @@ import java.util.List;
 @RestController
 @Tag(name = "Usuário", description = "Contém todas as operações relativas aos recursos para o gerenciamento de usuário.")
 @ApiResponses(value = {
-        // CORREÇÃO AQUI: Sucesso retorna UserDTO, não ErrorMessage
         @ApiResponse(responseCode = "200", description = "Successful operation", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class)) }),
 
         @ApiResponse(responseCode = "404", description = "user not found"),
 
-        // Erro 500 continua retornando ErrorMessage (agora com o import correto)
         @ApiResponse(responseCode = "500", description = "Internal server error", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)) })
 })
