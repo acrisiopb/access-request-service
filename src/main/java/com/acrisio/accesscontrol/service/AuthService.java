@@ -5,6 +5,8 @@ import com.acrisio.accesscontrol.api.dto.AuthResponseDTO;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.UserRepository;
 import com.acrisio.accesscontrol.infrastructure.security.JwtTokenProvider;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private  InternationalizationUtil message;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
@@ -22,9 +25,9 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(AuthLoginRequest req) {
-        User user = userRepository.findByEmail(req.email()).orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+        User user = userRepository.findByEmail(req.email()).orElseThrow(() -> new IllegalArgumentException(message.getMessage("Auth.invalid")));
         if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException(message.getMessage("Auth.invalid"));
         }
         String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail());
         return new AuthResponseDTO(token, jwtTokenProvider.expirationFromNow(), user.getId(), user.getName(), user.getEmail(), user.getDepartment().name());

@@ -7,6 +7,7 @@ import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.enums.RequestStatus;
 import com.acrisio.accesscontrol.domain.repository.AccessRequestRepository;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 public class DuplicateActiveRequestRule implements AccessRequestRule {
 
     private final AccessRequestRepository accessRequestRepository;
-
+    private InternationalizationUtil message;
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
@@ -28,7 +29,7 @@ public class DuplicateActiveRequestRule implements AccessRequestRule {
                             req.getModules().stream().anyMatch(m -> m.getId().equals(requested.getId())));
             if (conflict) {
                 throw new IllegalArgumentException(
-                        "Usuário já possui uma solicitação ativa para o módulo: " + requested.getName()
+                        message.getMessage("rule.duplicateActiveRequestRule.info") + " " + requested.getName()
                 );
             }
         }

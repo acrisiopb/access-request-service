@@ -4,6 +4,7 @@ import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
 import com.acrisio.accesscontrol.domain.model.Access;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Component
 public class DuplicateActiveAccessRule implements AccessRequestRule {
-
+    private InternationalizationUtil message;
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
@@ -32,7 +33,7 @@ public class DuplicateActiveAccessRule implements AccessRequestRule {
 
                 if (sameModule && notExpired) {
                     throw new IllegalArgumentException(
-                            "Usuário já possui acesso ativo ao módulo: " + requested.getName()
+                            message.getMessage("rule.duplicateActiveAccessRule.info") + " " + requested.getName()
                     );
                 }
             }

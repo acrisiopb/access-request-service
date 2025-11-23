@@ -4,13 +4,14 @@ import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
 import com.acrisio.accesscontrol.domain.enums.Department;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @Component
 public class ModuleLimitRule implements AccessRequestRule {
-
+    private InternationalizationUtil message;
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
@@ -22,9 +23,10 @@ public class ModuleLimitRule implements AccessRequestRule {
 
         if (activeCount + requestedModules.size() > limit) {
             throw new IllegalArgumentException(
-                    "Limite de módulos ativos excedido. Departamento " + user.getDepartment()
-                            + " permite no máximo " + limit + " módulos."
-            );
+                   message.getMessage("rule.moduleLimitRule.info") + "  " + user.getDepartment()
+                            +  message.getMessage("rule.moduleLimitRule.infoII") + " " + limit + " " +
+                           message.getMessage("rule.moduleCompatibilityRule.infoI")
+                    );
         }
     }
 }

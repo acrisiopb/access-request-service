@@ -4,6 +4,7 @@ import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
 import com.acrisio.accesscontrol.domain.enums.Department;
 import com.acrisio.accesscontrol.domain.model.Module;
 import com.acrisio.accesscontrol.domain.model.User;
+import com.acrisio.accesscontrol.infrastructure.util.InternationalizationUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Component
 public class DepartmentPermissionRule implements AccessRequestRule {
 
+    private InternationalizationUtil message;
     @Override
     public void validate(User user, Set<Module> requestedModules, AccessRequestCreateDTO dto) {
 
@@ -32,7 +34,7 @@ public class DepartmentPermissionRule implements AccessRequestRule {
                         code.equals("PORTAL")) {
                     continue;
                 }
-                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+                throw new IllegalArgumentException( message.getMessage("rule.departmentPermissionRule.info") + " " + module.getName());
             }
 
             // RH
@@ -43,7 +45,7 @@ public class DepartmentPermissionRule implements AccessRequestRule {
                         code.equals("PORTAL")) {
                     continue;
                 }
-                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+                throw new IllegalArgumentException( message.getMessage("rule.departmentPermissionRule.info") + " " + module.getName());
             }
 
             // Operações
@@ -54,7 +56,7 @@ public class DepartmentPermissionRule implements AccessRequestRule {
                         code.equals("PORTAL")) {
                     continue;
                 }
-                throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+                throw new IllegalArgumentException( message.getMessage("rule.departmentPermissionRule.info") + " " + module.getName());
             }
 
             // Outros departamentos
@@ -62,7 +64,7 @@ public class DepartmentPermissionRule implements AccessRequestRule {
                 continue;
             }
 
-            throw new IllegalArgumentException("Departamento sem permissão para acessar o módulo: " + module.getName());
+            throw new IllegalArgumentException( message.getMessage("rule.departmentPermissionRule.info") + " " + module.getName());
         }
     }
 }

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.acrisio.accesscontrol.domain.enums.HistoryAction;
+import com.acrisio.accesscontrol.domain.model.*;
+import com.acrisio.accesscontrol.domain.model.Module;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,11 +20,6 @@ import com.acrisio.accesscontrol.api.dto.AccessRequestFilterDTO;
 import com.acrisio.accesscontrol.api.dto.AccessRequestResponseDTO;
 import com.acrisio.accesscontrol.api.dto.ModuleDTO;
 import com.acrisio.accesscontrol.domain.enums.RequestStatus;
-import com.acrisio.accesscontrol.domain.model.Access;
-import com.acrisio.accesscontrol.domain.model.AccessRequest;
-import com.acrisio.accesscontrol.domain.model.Module;
-import com.acrisio.accesscontrol.domain.model.ProtocolSequence;
-import com.acrisio.accesscontrol.domain.model.User;
 import com.acrisio.accesscontrol.domain.repository.AccessRepositoy;
 import com.acrisio.accesscontrol.domain.repository.AccessRequestRepository;
 import com.acrisio.accesscontrol.domain.repository.ModuleRepository;
@@ -95,19 +93,15 @@ public class AccessRequestService {
 
     public AccessRequestResponseDTO findById(Long requestId, Long currentUserId) {
 
-        // 1) Busca a solicitação
         AccessRequest req = accessRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
-        // 2) Valida se ela pertence ao usuário do token
         if (!req.getUser().getId().equals(currentUserId)) {
             throw new EntityNotFoundException(message.getMessage("AccessRequest.notfound"));
         }
 
-        // 3) Retorna a solicitação
         return toResponseDTO(req);
     }
-
 
 
     public List<AccessRequestResponseDTO> listByUser(Long userId) {
@@ -122,43 +116,56 @@ public class AccessRequestService {
     }
 
     @Transactional
-    public AccessRequestResponseDTO cancel(Long requestId, String reason) {
+    public AccessRequestResponseDTO cancel(Long requestId, Long currentUserId, String reason) {
 
+        // Buscar a solicitação
         AccessRequest req = accessRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException(message.getMessage("AccessRequest.notfound")));
 
-        if (req.getStatus() == RequestStatus.DENIED) {
-            throw new IllegalArgumentException(message.getMessage("AccessRequest.denied"));
+        //  Validar que pertence ao usuário autenticado
+        if (!req.getUser().getId().equals(currentUserId)) {
+            throw new EntityNotFoundException(message.getMessage("AccessRequest.notfound"));
         }
 
+        // Validar que está ATIVO
+        if (req.getStatus() != RequestStatus.ACTIVE) {
+            throw new IllegalArgumentException(message.getMessage("AccessRequest.active.cancelled"));
+        }
+
+        // Validar motivo do cancelamento
         if (reason == null || reason.trim().length() < 10 || reason.trim().length() > 200) {
-            throw new IllegalArgumentException("Motivo do cancelamento deve ter entre 10 e 200 caracteres");
+            throw new IllegalArgumentException(message.getMessage("AccessRequst.reason"));
         }
 
+        // Atualizar a solicitação para CANCELADA
         req.setStatus(RequestStatus.CANCELED);
         req.setDeniedReason(reason);
         req.setExpiresAt(null);
 
-        var user = req.getUser();
-        var modules = req.getModules();
+        // Revogar acessos vinculados
+        User user = req.getUser();
+        Set<Module> modules = req.getModules();
+
         for (Access access : user.getActiveAccesses()) {
             if (modules.contains(access.getModule())) {
                 accessRepository.delete(access);
             }
         }
 
-        var history = com.acrisio.accesscontrol.domain.model.RequestHistory.builder()
+        // Registrar histórico
+        RequestHistory history = RequestHistory.builder()
                 .accessRequest(req)
-                .action(com.acrisio.accesscontrol.domain.enums.HistoryAction.CANCELED)
+                .action(HistoryAction.CANCELED)
                 .description(reason)
-                .date(java.time.OffsetDateTime.now())
+                .date(OffsetDateTime.now())
                 .build();
-        requestHistoryRepository.save(history);
 
+        requestHistoryRepository.save(history);
         accessRequestRepository.save(req);
 
         return toResponseDTO(req);
     }
+
 
     @Transactional
     public void delete(Long id) {
@@ -192,11 +199,6 @@ public class AccessRequestService {
         return true; // Se nenhuma regra lançar exceção → aprovado
     }
 
-//    private String generateProtocol() {
-//        String date = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-//        long number = System.currentTimeMillis() % 10000;
-//        return "SOL-" + date + "-" + number;
-//    }
     @Transactional
     public String generateProtocol() {
 
@@ -268,19 +270,19 @@ public class AccessRequestService {
 
         // Regra 1 — Só solicitações ATIVAS podem ser renovadas
         if (oldRequest.getStatus() != RequestStatus.ACTIVE) {
-            throw new IllegalArgumentException("Somente solicitações ATIVAS podem ser renovadas.");
+            throw new IllegalArgumentException(message.getMessage("AccessRequest.renew.cancelled"));
         }
 
         // Regra 2 — Só pode renovar quando faltarem menos de 30 dias
         if (oldRequest.getExpiresAt().isAfter(OffsetDateTime.now().plusDays(30))) {
-            throw new IllegalArgumentException("Renovação permitida apenas quando faltarem menos de 30 dias para expirar.");
+            throw new IllegalArgumentException(message.getMessage("AccessRequest.info.renew"));
         }
 
         // Regra 3 — A renovação é uma NOVA solicitação
         AccessRequest newRequest = new AccessRequest();
         newRequest.setUser(user);
         newRequest.setModules(oldRequest.getModules());
-        newRequest.setJustification("Renovação automática da solicitação: " + oldRequest.getProtocol());
+        newRequest.setJustification(message.getMessage("AccessRequest.renew") + " " + oldRequest.getProtocol());
         newRequest.setUrgent(false);
         newRequest.setCreatedAt(OffsetDateTime.now());
         newRequest.setOriginRequest(oldRequest); // vincula a antiga

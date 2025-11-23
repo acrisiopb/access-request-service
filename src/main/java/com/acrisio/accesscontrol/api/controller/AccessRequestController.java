@@ -1,10 +1,6 @@
 package com.acrisio.accesscontrol.api.controller;
 
-import com.acrisio.accesscontrol.api.dto.AccessRequestCreateDTO;
-import com.acrisio.accesscontrol.api.dto.AccessRequestCreateInput;
-import com.acrisio.accesscontrol.api.dto.AccessRequestFilterDTO;
-import com.acrisio.accesscontrol.api.dto.AccessRequestIdDTO;
-import com.acrisio.accesscontrol.api.dto.AccessRequestResponseDTO;
+import com.acrisio.accesscontrol.api.dto.*;
 import com.acrisio.accesscontrol.exception.ErrorMessage;
 import com.acrisio.accesscontrol.infrastructure.security.CurrentUserProvider;
 import com.acrisio.accesscontrol.service.AccessRequestService;
@@ -56,13 +52,21 @@ public class AccessRequestController {
         return ResponseEntity.ok(accessRequestService.createRequest(dto));
     }
 
-    @Operation(summary = "Cancelar solicitação de acesso", description = "Cancelamento da solicitação por ID e motivo.")
+    @Operation(summary = "Cancelar solicitação de acesso", description = "Cancelamento da solicitação por ID da solicitação e motivo. O usuário só pode cancelar suas solicitações.")
     @PostMapping("/cancel")
-    public ResponseEntity<AccessRequestResponseDTO> cancel(
-            @Valid @RequestBody com.acrisio.accesscontrol.api.dto.AccessRequestCancelDTO dto) {
+    public ResponseEntity<AccessRequestResponseDTO> cancel(@RequestBody AccessRequestCancelDTO dto) {
 
-        return ResponseEntity.ok(accessRequestService.cancel(dto.id(), dto.reason()));
+        var currentUser = currentUserProvider.get();
+
+        return ResponseEntity.ok(
+                accessRequestService.cancel(
+                        dto.id(),
+                        currentUser.getId(),
+                        dto.reason()
+                )
+        );
     }
+
 
     @Operation(summary = "Renovar solicitação de acesso", description = "Renovação por ID da solicitação.")
     @PostMapping("/renew")
@@ -77,11 +81,9 @@ public class AccessRequestController {
     @GetMapping("/find")
     public ResponseEntity<List<AccessRequestResponseDTO>> find() {
 
-        // 1. PEGA O USUÁRIO DO TOKEN AUTOMATICAMENTE
         var currentUser = currentUserProvider.get();
         Long userIdFromToken = currentUser.getId();
 
-        // 2. BUSCA TODAS AS SOLICITAÇÕES DESSE USUÁRIO
         List<AccessRequestResponseDTO> list =
                 accessRequestService.listByUser(userIdFromToken);
 

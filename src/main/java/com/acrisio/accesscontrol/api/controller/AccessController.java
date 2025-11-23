@@ -2,6 +2,7 @@ package com.acrisio.accesscontrol.api.controller;
 
 import com.acrisio.accesscontrol.api.dto.AccessIdDTO;
 import com.acrisio.accesscontrol.api.dto.AccessResponseDTO;
+import com.acrisio.accesscontrol.infrastructure.security.CurrentUserProvider;
 import com.acrisio.accesscontrol.service.AccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +34,8 @@ import java.util.List;
 public class AccessController {
 
     private final AccessService accessService;
+    private final CurrentUserProvider currentUserProvider;
+
 
     @Operation(summary = "Revogação de acesso de usuário ao módulo.", description = "Revogação de accesso de usuario ao módulo por ID do acesso.")
     @PostMapping("/revoke")
@@ -42,7 +45,12 @@ public class AccessController {
     @Operation(summary = "Renovar  accesso de usuário", description = " Renovar acesso do usuario por ID do acesso.")
     @PostMapping("/renew")
     public ResponseEntity<AccessResponseDTO> renew(@RequestBody AccessIdDTO dto) {
-        return ResponseEntity.ok(accessService.renew(dto.id()));
+
+        var currentUser = currentUserProvider.get();
+
+        return ResponseEntity.ok(
+                accessService.renew(dto.id(), currentUser.getId())
+        );
     }
     @Operation(summary = "Buscar de acesso.", description = "Buscar o acesso do usuário por ID do acesso.")
     @PostMapping("/find")
