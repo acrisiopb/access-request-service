@@ -124,7 +124,7 @@ class AccessControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(renewDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Access.notfound"));
+                .andExpect(jsonPath("$.message").value("ID access notfound."));
     }
 
 
