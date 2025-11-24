@@ -1,10 +1,10 @@
 # Serviço de solicitação de acesso <h5>`Access Request Service`</h5>
 
+Serviço de controle de acessos corporativos com autenticação JWT, solicitações de acesso, renovação e histórico, pronto para execução local com Docker e com suíte de testes e cobertura configuradas.
+
 <div align="center"> 
   <img src="https://github.com/acrisiopb/access-request-service/blob/main/Img/Access.gif" alt="Apresentação">
 </div> 
-
-Serviço de controle de acessos corporativos com autenticação JWT, solicitações de acesso, renovação e histórico, pronto para execução local com Docker e com suíte de testes e cobertura configuradas.
 
 ## Descrição do Projeto
 - API REST para gerenciar:
@@ -66,16 +66,15 @@ Serviço de controle de acessos corporativos com autenticação JWT, solicitaç�
    - App usa perfil `postgres` quando executada via Compose (variáveis `DB_URL`, `DB_USER`, `DB_PASS`)
 
 ## Executar Sem Docker (opcional)
-- Windows: `./mvnw.cmd spring-boot:run`
- -OBS: Se estive executando sem docker, pode abrir sua IDE e executar normalmente.
+- Windows: `mvn spring-boot:run`\
+ OBS: Se estive executando sem docker, pode abrir sua IDE e executar normalmente. 
 
 - Porta padrão: `http://localhost:8080/`
 
 ## Executar os Testes
-- Windows: `./mvnw.cmd -q test`
-- Linux/Mac: `./mvnw -q test`
+- Windows: `mvn -q test`
 
-Observação: os testes de controllers exercitam cenários de erro (401/404/422). O handler de exceções loga esses eventos; isso é esperado e não indica falha.
+OBS: os testes de controllers exercitam cenários de erro (401/404/422). O handler de exceções loga esses eventos; isso é esperado e não indica falha.
 
 ## Visualizar Relatório de Cobertura
 1. Gerar relatório Jacoco:
@@ -93,6 +92,28 @@ Observação: os testes de controllers exercitam cenários de erro (401/404/422)
   - Senha: `test123`
 - Usuários adicionais (perfil dev / Postgres) estão em `src/main/resources/import-dev.sql`.
 
+
+<h1>Prévia - Captura de Tela</h1>
+
+ Img Swagger I |  Img Swagger II   |   Img  Swagger III                                                    |
+|:-----:|:-----------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------:|
+  <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Swagger_I_nxbbej.png" alt="1" width="400" /> | <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Swagger_II_tvep4d.png" alt="2" width="400" /> | <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Swagger_III_fqeyuu.png" alt="3" width="400" /> |
+
+ Img  Swagger IV | Img Swagger V  |    Img Relatorio Jacoco VI                                              |
+|:-----:|:-----------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------:|
+  <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988142/Swagger_IV_gayn7b.png" alt="4" width="400" /> |                                           <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988142/Swagger_V_wuqqo3.png" alt="5" width="400" />                                            | <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988144/JACOCO_klzxad.png" alt="6" width="400" /> |
+
+
+ Img Docker VII  | Img Diagrama VIII   |   Img Diagrama IX
+|:-----:|:----------------------------------------------------------------------------------------------------------------:|:------------------:| 
+<img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/docker_iliq4g.png" alt="7" width="400" /> |                                        <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988140/Diagrama_I_qkapp6.png" alt="8" width="400" />                                        | <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Diagrama_II_g9wznd.png" alt="8" width="400" /> 
+
+Img Diagrama X  |  Img Diagrama XI |  Img Diagrama XII
+|:-----:|:----------------------------------------------------------------------------------------------------------------:|:------------------:| 
+<img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Diagrama_III_fhkw2c.png" alt="7" width="400" />          | <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988141/Diagrama_IV_rsyzg4.png" alt="7" width="400" />                     |<img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988142/Diagrama_V_lysahh.png" alt="7" width="400" />  
+Img Diagrama XIII  |  Img Diagrama XIV 
+<img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988142/Diagrama_VI_vn2xog.png" alt="7" width="400" />  |    <img src="https://res.cloudinary.com/dyk1w5pnr/image/upload/v1763988144/Diagrama_VII_tunhmn.png" alt="7" width="400" /> 
+ 
 ## Exemplos de Requisições
 Autenticar e obter token:
 ```bash
@@ -161,5 +182,14 @@ curl -s -X POST http://localhost:8080/access/revoke \
 
 
   <h3>Aviso Legal</h3> 
-  <p>Desenvolvido por Acrísio Cruz. Todos os direitos reservados © 2025.</p>
+ <div  align="center">
+  <picture>
+    <!-- Imagem para o modo escuro -->
+    <source srcset="https://github.com/acrisiopb/acrisiopb/blob/main/IMG/acrisioBlack.gif" media="(prefers-color-scheme: dark)">
+    <!-- Imagem para o modo claro -->
+    <source srcset="https://github.com/acrisiopb/acrisiopb/blob/main/IMG/acrisiowhite.gif" media="(prefers-color-scheme: light)">
+    <img src="https://github.com/acrisiopb/acrisiopb/blob/main/IMG/acrisioBlack.gif" alt="capa GitHub Acrísio">
+  </picture>
+</div>
+<p>Desenvolvido por Acrísio Cruz. Todos os direitos reservados © 2025.</p>
 
