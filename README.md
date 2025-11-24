@@ -190,6 +190,6 @@ curl -s -X POST http://localhost:8080/access/revoke \
     <source srcset="https://github.com/acrisiopb/acrisiopb/blob/main/IMG/acrisiowhite.gif" media="(prefers-color-scheme: light)">
     <img src="https://github.com/acrisiopb/acrisiopb/blob/main/IMG/acrisioBlack.gif" alt="capa GitHub Acrísio">
   </picture>
+   <p>Desenvolvido por Acrísio Cruz. Todos os direitos reservados © 2025.</p>
 </div>
-<p>Desenvolvido por Acrísio Cruz. Todos os direitos reservados © 2025.</p>
 
