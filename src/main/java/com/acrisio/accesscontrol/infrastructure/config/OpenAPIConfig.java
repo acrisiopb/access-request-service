@@ -19,7 +19,7 @@ public class OpenAPIConfig {
     public OpenAPI accessControlAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Access Control API")
+                        .title("Controle de Acessos Corporativo - API")
                         .description(
                                 "Serviço de controle de acessos corporativos com autenticação JWT, solicitações de acesso, renovação e histórico.\n\n" +
                                 "API para gerenciamento de usuários, módulos, acessos e solicitações de acesso.\n\n" +
