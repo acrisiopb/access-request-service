@@ -1,11 +1,11 @@
 -- dev data
-INSERT INTO tb_user (id_tb_user, tb_user_name, tb_user_email, tb_user_password_hash, tb_user_department) VALUES
-  (1, 'Alice Dev', 'alice@corp.com', '$2a$10$7U/UG5V5XQoBU.DQk.UkGePoWKjrCuQwyfjHjG3r9mLThl/PNS68.', 'TI'),
-  (2, 'Bruno Finance', 'bruno@corp.com', '$2a$10$vA3A5.jTbpjRkx0e5j2qXe7V7nzsXwp5Z7S0AXDhlE7yYbfo8xO6u', 'FINANCE'),
-  (3, 'Carla RH', 'carla@corp.com', '$2a$10$wYcT2fQwp1rVgJjHdlV9huGKfCmwYquEzw9tCvoj57e80fRr2PrjW', 'RH'),
-  (4, 'Diego Ops', 'diego@corp.com', '$2a$10$5lGz0sY4q2bcmWA7E1v9YOAtY8RR9h5xEeo6zQNG5pFZ8KNEq7g7q', 'OPERATIONS'),
-  (5, 'Eva Other', 'eva@corp.com', '$2a$10$5lGz0sY4q2bcmWA7E1v9YOAtY8RR9h5xEeo6zQNG5pFZ8KNEq7g7q', 'OTHER'),
-  (6, 'Test Admin', 'test@admin.com', '$2a$10$GeIOlVIbxqfzEUqFHUF5VeK/iu7GrXuSs1MNQ277JljfUP838UB5.', 'TI');
+INSERT INTO tb_user (tb_user_name, tb_user_email, tb_user_password_hash, tb_user_department) VALUES
+  ('Alice Dev', 'alice@corp.com', '$2a$10$7U/UG5V5XQoBU.DQk.UkGePoWKjrCuQwyfjHjG3r9mLThl/PNS68.', 'TI'),
+  ('Bruno Finance', 'bruno@corp.com', '$2a$10$vA3A5.jTbpjRkx0e5j2qXe7V7nzsXwp5Z7S0AXDhlE7yYbfo8xO6u', 'FINANCE'),
+  ('Carla RH', 'carla@corp.com', '$2a$10$wYcT2fQwp1rVgJjHdlV9huGKfCmwYquEzw9tCvoj57e80fRr2PrjW', 'RH'),
+  ('Diego Ops', 'diego@corp.com', '$2a$10$5lGz0sY4q2bcmWA7E1v9YOAtY8RR9h5xEeo6zQNG5pFZ8KNEq7g7q', 'OPERATIONS'),
+  ('Eva Other', 'eva@corp.com', '$2a$10$5lGz0sY4q2bcmWA7E1v9YOAtY8RR9h5xEeo6zQNG5pFZ8KNEq7g7q', 'OTHER'),
+  ('Test Admin', 'test@admin.com', '$2a$10$GeIOlVIbxqfzEUqFHUF5VeK/iu7GrXuSs1MNQ277JljfUP838UB5.', 'TI');
 
 INSERT INTO tb_module (id_tb_module, tb_module_name, tb_module_description, tb_module_active) VALUES
   (1, 'PORTAL', 'Acesso geral ao portal', true),

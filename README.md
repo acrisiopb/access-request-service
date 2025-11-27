@@ -67,7 +67,8 @@ Serviço de controle de acessos corporativos com autenticação JWT, solicitaç�
 
 ## Executar Sem Docker (opcional)
 - Windows: `mvn spring-boot:run`\
- OBS: Se estive executando sem docker, pode abrir sua IDE e executar normalmente. 
+
+  OBS: Se estiver executando sem Docker, você pode abrir sua IDE e rodar o projeto normalmente com o comando informado. O banco será criado no H2 temporariamente.
 
 - Porta padrão: `http://localhost:8080/`
 

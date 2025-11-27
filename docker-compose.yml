@@ -24,7 +24,7 @@ services:
     build: .
     container_name: access_app_1
     environment:
-      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres,seed
       DB_URL: jdbc:postgresql://postgres:5432/access_db
       DB_USER: postgres
       DB_PASS: postgres
@@ -38,6 +38,7 @@ services:
     build: .
     container_name: access_app_2
     environment:
+      SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/access_db
       DB_USER: postgres
       DB_PASS: postgres
@@ -51,6 +52,7 @@ services:
     build: .
     container_name: access_app_3
     environment:
+      SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/access_db
       DB_USER: postgres
       DB_PASS: postgres
