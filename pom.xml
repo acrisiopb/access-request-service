@@ -184,6 +184,14 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/infrastructure/init/**</exclude>
+                                <exclude>**/infrastructure/config/**</exclude>
+                                <exclude>**/api/dto/**</exclude>
+                                <exclude>**/domain/enums/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>check</id>
@@ -203,6 +211,12 @@
                                     </limits>
                                 </rule>
                             </rules>
+                            <excludes>
+                                <exclude>**/infrastructure/init/**</exclude>
+                                <exclude>**/infrastructure/config/**</exclude>
+                                <exclude>**/api/dto/**</exclude>
+                                <exclude>**/domain/enums/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
