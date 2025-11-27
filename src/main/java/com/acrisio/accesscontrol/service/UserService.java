@@ -71,10 +71,10 @@ public class UserService {
             throw new NameUniqueViolationException(message.getMessage("User.email"));
         }
 
-        if (userRepository.existsByEmail(dto.email())) {
+        if (!user.getEmail().equals(dto.email()) &&
+                userRepository.existsByEmail(dto.email())) {
             throw new NameUniqueViolationException(message.getMessage("User.emailExists"));
         }
-
 
         if (dto.department() == null) {
             throw new UnprocessableEntityException(message.getMessage("Department.User"));
@@ -102,7 +102,6 @@ public class UserService {
                 .toList();
     }
 
-
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(message.getMessage("User.notfound")));
@@ -110,14 +109,12 @@ public class UserService {
         return toDTO(user);
     }
 
-
     private UserDTO toDTO(User user) {
         return new UserDTO(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getDepartment()
-        );
+                user.getDepartment());
     }
 
 }
